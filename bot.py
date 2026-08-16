@@ -1,3 +1,5 @@
+import threading
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import asyncio
 import json
@@ -199,7 +201,44 @@ async def chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # MAIN
 # ============================================================
 
+# ============================================================
+# RENDER HEALTH SERVER
+# ============================================================
+
+class HealthHandler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/plain")
+        self.end_headers()
+        self.wfile.write(b"Bot is running")
+
+    def log_message(self, format, *args):
+        pass
+
+
+def start_health_server():
+
+    port = int(os.environ.get("PORT", 10000))
+
+    server = HTTPServer(
+        ("0.0.0.0", port),
+        HealthHandler
+    )
+
+    print(f"🌐 Health server running on port {port}")
+
+    server.serve_forever()
+
 def main():
+
+    # Start Render health server
+    health_thread = threading.Thread(
+        target=start_health_server,
+        daemon=True
+    )
+
+    health_thread.start()
 
     app = (
         Application.builder()
@@ -227,7 +266,5 @@ def main():
     print(f"📝 Log file: {LOG_FILE}")
 
     app.run_polling()
-
-
 if __name__ == "__main__":
     main()
