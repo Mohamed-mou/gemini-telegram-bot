@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Bot Sessions</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "SF Pro Text",
+        "Segoe UI",
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #1c1c1e 0%,
+            #0d0d0f 45%,
+            #000000 100%
+        );
+
+    color: #f5f5f7;
+}
+
+.container {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 50px 0;
+}
+
+/* HEADER */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.title h1 {
+    margin: 0;
+    font-size: 38px;
+    letter-spacing: -1.5px;
+}
+
+.title p {
+    margin-top: 8px;
+    color: #98989d;
+}
+
+/* STATUS */
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 9px 14px;
+
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.08);
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    color: #aaa;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+
+    background: #30d158;
+
+    border-radius: 50%;
+
+    box-shadow: 0 0 12px #30d158;
+}
+
+/* CARDS */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+
+    margin-bottom: 25px;
+}
+
+.card {
+    padding: 22px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.09),
+            rgba(255,255,255,.035)
+        );
+
+    border:
+        1px solid rgba(255,255,255,.09);
+
+    border-radius: 22px;
+
+    backdrop-filter: blur(20px);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.25);
+}
+
+.card-label {
+    color: #98989d;
+    font-size: 14px;
+}
+
+.card-value {
+    margin-top: 7px;
+
+    font-size: 32px;
+    font-weight: 600;
+
+    letter-spacing: -1px;
+}
+
+/* TABLE */
+
+.table-container {
+    overflow: hidden;
+
+    background:
+        rgba(255,255,255,.055);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    border-radius: 22px;
+
+    backdrop-filter: blur(25px);
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.35);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: rgba(255,255,255,.045);
+}
+
+th {
+    padding: 18px;
+
+    text-align: left;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: .6px;
+
+    color: #8e8e93;
+}
+
+td {
+    padding: 18px;
+
+    border-top:
+        1px solid rgba(255,255,255,.06);
+
+    font-size: 14px;
+}
+
+tr:hover {
+    background: rgba(255,255,255,.035);
+}
+
+/* USER */
+
+.user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #555,
+            #222
+        );
+
+    font-weight: 600;
+}
+
+.username {
+    color: #98989d;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.badge {
+    padding: 5px 9px;
+
+    background: rgba(48,209,88,.12);
+
+    color: #30d158;
+
+    border-radius: 999px;
+
+    font-size: 12px;
+}
+
+/* EMPTY */
+
+.empty {
+    padding: 60px;
+
+    text-align: center;
+
+    color: #8e8e93;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        align-items: flex-start;
+        gap: 15px;
+        flex-direction: column;
+    }
+
+    .title h1 {
+        font-size: 30px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 750px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+
+        <div class="title">
+            <h1>Bot Sessions</h1>
+            <p>Telegram user activity</p>
+        </div>
+
+        <div class="status">
+            <span class="status-dot"></span>
+            Live data
+        </div>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="card">
+            <div class="card-label">
+                Total Users
+            </div>
+
+            <div
+                class="card-value"
+                id="totalUsers">
+                0
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-label">
+                Total Messages
+            </div>
+
+            <div
+                class="card-value"
+                id="totalMessages">
+                0
+            </div>
+        </div>
+
+
+        <div class="card">
+            <div class="card-label">
+                Active Today
+            </div>
+
+            <div
+                class="card-value"
+                id="activeToday">
+                0
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>User</th>
+                    <th>Telegram ID</th>
+                    <th>Messages</th>
+                    <th>First Seen</th>
+                    <th>Last Seen</th>
+                </tr>
+
+            </thead>
+
+            <tbody id="usersTable">
+
+            </tbody>
+
+        </table>
+
+        <div
+            class="empty"
+            id="empty">
+            Loading...
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+async function loadData() {
+
+    try {
+
+        const response =
+            await fetch("log-session.json?t=" + Date.now());
+
+        if (!response.ok) {
+            throw new Error("Could not load log-session.json");
+        }
+
+        const users =
+            await response.json();
+
+        const userList =
+            Object.values(users);
+
+        document.getElementById(
+            "totalUsers"
+        ).textContent =
+            userList.length;
+
+
+        const totalMessages =
+            userList.reduce(
+                (total, user) =>
+                    total + (user.messages || 0),
+                0
+            );
+
+        document.getElementById(
+            "totalMessages"
+        ).textContent =
+            totalMessages;
+
+
+        const today =
+            new Date().toISOString().slice(0, 10);
+
+        const activeToday =
+            userList.filter(user => {
+
+                return user.last_seen &&
+                    user.last_seen.startsWith(today);
+
+            }).length;
+
+
+        document.getElementById(
+            "activeToday"
+        ).textContent =
+            activeToday;
+
+
+        const table =
+            document.getElementById(
+                "usersTable"
+            );
+
+        const empty =
+            document.getElementById(
+                "empty"
+            );
+
+
+        table.innerHTML = "";
+
+
+        if (userList.length === 0) {
+
+            empty.textContent =
+                "No users yet.";
+
+            return;
+
+        }
+
+
+        empty.style.display =
+            "none";
+
+
+        userList
+            .sort(
+                (a, b) =>
+                    new Date(b.last_seen) -
+                    new Date(a.last_seen)
+            )
+            .forEach(user => {
+
+                const row =
+                    document.createElement("tr");
+
+
+                const name =
+                    [
+                        user.first_name,
+                        user.last_name
+                    ]
+                    .filter(Boolean)
+                    .join(" ") ||
+                    "Unknown";
+
+
+                const username =
+                    user.username
+                    ? "@" + user.username
+                    : "No username";
+
+
+                const initial =
+                    name.charAt(0)
+                    .toUpperCase();
+
+
+                row.innerHTML = `
+
+                    <td>
+
+                        <div class="user">
+
+                            <div class="avatar">
+                                ${escapeHTML(initial)}
+                            </div>
+
+                            <div>
+
+                                <div>
+                                    ${escapeHTML(name)}
+                                </div>
+
+                                <div class="username">
+                                    ${escapeHTML(username)}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </td>
+
+                    <td>
+                        ${escapeHTML(String(user.user_id))}
+                    </td>
+
+                    <td>
+                        <span class="badge">
+                            ${user.messages || 0}
+                        </span>
+                    </td>
+
+                    <td>
+                        ${formatDate(user.first_seen)}
+                    </td>
+
+                    <td>
+                        ${formatDate(user.last_seen)}
+                    </td>
+
+                `;
+
+                table.appendChild(row);
+
+            });
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById(
+            "empty"
+        ).textContent =
+            "Unable to load session data.";
+
+    }
+
+}
+
+
+function formatDate(date) {
+
+    if (!date)
+        return "—";
+
+    return new Date(date)
+        .toLocaleString();
+
+}
+
+
+function escapeHTML(value) {
+
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+loadData();
+
+
+/*
+   Refresh every 5 seconds
+*/
+
+setInterval(
+    loadData,
+    5000
+);
+
+</script>
+
+</body>
+</html>
